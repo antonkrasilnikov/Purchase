@@ -8,13 +8,16 @@ let package = Package(
     products: [
         .library(
             name: "Purchase",
-            targets: ["Purchase"]),
+            targets: ["AppStoreManager","Purchase"]),
     ],
     dependencies: [],
     targets: [
         .target(
-            name: "Purchase",
+            name: "AppStoreManager",
             dependencies: []),
+        .target(
+            name: "Purchase",
+            dependencies: ["AppStoreManager"]),
         .testTarget(
             name: "PurchaseTests",
             dependencies: ["Purchase"]),

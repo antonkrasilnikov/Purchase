@@ -5,6 +5,7 @@
 
 #import <Foundation/Foundation.h>
 #import "AppStorePurchase.h"
+#import "PurchaseProduct.h"
 
 extern _Nonnull NSNotificationName const AppStoreManagerPromoteInAppBought;
 
