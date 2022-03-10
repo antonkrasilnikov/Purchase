@@ -9,7 +9,7 @@
 
 @interface AppStoreProductCheckOperation : NSObject
 
-+(void)checkIds:(NSArray<NSString*>*)productdIds handler:(void (^)(SKProductsResponse* responce))handler;
++(instancetype)scheduledOperationIds:(NSArray<NSString*>*)productdIds handler:(void (^)(SKProductsResponse* responce))handler;
 
 @end
 

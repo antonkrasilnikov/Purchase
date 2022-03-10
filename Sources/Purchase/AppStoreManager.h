@@ -6,31 +6,31 @@
 #import <Foundation/Foundation.h>
 #import "AppStorePurchase.h"
 
-extern NSString* const kNotificationAppStoreManagerPromoteInAppBought;
+extern _Nonnull NSNotificationName const AppStoreManagerPromoteInAppBought;
 
 @interface AppStoreManager : NSObject
 
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+- (instancetype _Nonnull)init NS_UNAVAILABLE;
++ (instancetype _Nonnull)new NS_UNAVAILABLE;
 
 + (void)touch;
 
 + (BOOL)isInBuying;
 
-+ (void)checkProducts:(NSArray<PurchaseProduct*>*)products
-          withHandler:(void (^)(BOOL checked)) verifyBlock;
++ (void)checkProducts:(NSArray<PurchaseProduct*>* _Nonnull)products
+          withHandler:(void (^ _Nonnull)(BOOL checked)) verifyBlock;
 
-+ (void)buyProduct:(PurchaseProduct*) product
-        onComplete:(void (^)(AppStorePurchase* purchase)) completionBlock
-       onFailed:(void (^)(NSError* error, BOOL canceled)) failedBlock;
++ (void)buyProduct:(PurchaseProduct* _Nonnull) product
+        onComplete:(void (^ _Nonnull)(AppStorePurchase* _Nonnull purchase)) completionBlock
+       onFailed:(void (^ _Nullable)(NSError* _Nullable error, BOOL canceled)) failedBlock;
 
-+ (NSArray<AppStorePurchase*>*)unfinishedPurchases;
-+ (void)finishTransaction:(NSString*)transactionId;
++ (NSArray<AppStorePurchase*>* _Nonnull)unfinishedPurchases;
++ (void)finishTransaction:(NSString* _Nonnull)transactionId;
 
-+ (void)checkForBeenPayedNonConsumableProduct:(PurchaseProduct*)product
-                               withOnComplete:(void (^)(BOOL wasAlreadyBuyed, AppStorePurchase* purchase))onRestoreCompleted
-                                     onFailed:(void (^)(NSError* error))onRestoreFailed;
-+ (void)restoreNonConsumablePurchasesWithOnComplete:(void (^)(NSArray<AppStorePurchase*>* purchases))onRestoreCompleted
-                                     onFailed:(void (^)(NSError* error))onRestoreFailed;
++ (void)checkForBeenPayedNonConsumableProduct:(PurchaseProduct* _Nonnull)product
+                               withOnComplete:(void (^ _Nonnull)(BOOL wasAlreadyBuyed, AppStorePurchase* _Nullable purchase))onRestoreCompleted
+                                     onFailed:(void (^ _Nullable)(NSError* _Nullable error))onRestoreFailed;
++ (void)restoreNonConsumablePurchasesWithOnComplete:(void (^ _Nonnull)(NSArray<AppStorePurchase*>* _Nullable purchases))onRestoreCompleted
+                                     onFailed:(void (^ _Nullable)(NSError* _Nullable error))onRestoreFailed;
 
 @end

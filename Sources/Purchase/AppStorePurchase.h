@@ -10,12 +10,16 @@
 
 @interface AppStorePurchase : NSObject <NSCoding>
 
-@property (nonatomic,retain) PurchaseProduct* product;
-@property (nonatomic,retain) NSString* transactionIdentifier;
-@property (nonatomic,retain) NSData*   transactionReceipt;
-@property (nonatomic,retain) NSDate*   purchasedDate;
-@property (nonatomic,assign) BOOL      isSandBox;
+@property (nonatomic,strong,nonnull,readonly) PurchaseProduct* product;
+@property (nonatomic,strong,nonnull,readonly) NSString* transactionIdentifier;
+@property (nonatomic,strong,nonnull,readonly) NSData*   transactionReceipt;
+@property (nonatomic,strong,nonnull,readonly) NSDate*   purchasedDate;
+@property (nonatomic,assign,readonly)         BOOL      isSandBox;
 
-+(AppStorePurchase*)purchaseWithProduct:(PurchaseProduct*)product transaction:(SKPaymentTransaction*)transaction;
+- (instancetype _Nonnull)init NS_UNAVAILABLE;
++ (instancetype _Nonnull)new NS_UNAVAILABLE;
+
++(AppStorePurchase* _Nonnull)purchaseWithProduct:(PurchaseProduct* _Nonnull)product
+                                     transaction:(SKPaymentTransaction* _Nonnull)transaction;
 
 @end

@@ -15,13 +15,13 @@ static PaymentQueue* _queue = nil;
 
 + (id)mutableArrayUsingWeakReferencesWithCapacity:(NSUInteger)capacity {
     CFArrayCallBacks callbacks = {0, NULL, NULL, CFCopyDescription, CFEqual};
-    return (id)(CFArrayCreateMutable(0, capacity, &callbacks));
+    return (id)CFBridgingRelease(CFArrayCreateMutable(0, capacity, &callbacks));
 }
 @end
 
 @interface PaymentQueue () <SKPaymentTransactionObserver>
 
-@property (nonatomic,retain) NSMutableArray<id<SKPaymentTransactionObserver>>* observers;
+@property (nonatomic,strong) NSMutableArray<id<SKPaymentTransactionObserver>>* observers;
 
 @end
 
@@ -58,10 +58,7 @@ static PaymentQueue* _queue = nil;
 
 - (void)dealloc
 {
-    self.observers = nil;
     [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
-    
-    [super dealloc];
 }
 
 -(NSArray<id<SKPaymentTransactionObserver>>*)getStrongRefObservers

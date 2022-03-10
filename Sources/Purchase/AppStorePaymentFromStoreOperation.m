@@ -26,7 +26,6 @@
 - (void)dealloc
 {
     [PaymentQueue removeObserver:self];
-    [super dealloc];
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions

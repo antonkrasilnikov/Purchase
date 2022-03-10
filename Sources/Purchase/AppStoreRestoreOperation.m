@@ -9,16 +9,16 @@
 
 @interface AppStoreRestoreOperation () <SKPaymentTransactionObserver>
 
-@property (nonatomic,retain) SKProduct* sk_product;
+@property (nonatomic,strong) SKProduct* sk_product;
 @property (nonatomic,copy) void (^handler)(AppStoreRestoreOperation* operation, SKPaymentTransaction* transaction, NSError* error, BOOL userCancel);
-@property (nonatomic,retain) SKPaymentTransaction* restoredTransaction;
+@property (nonatomic,strong) SKPaymentTransaction* restoredTransaction;
 @end
 
 @implementation AppStoreRestoreOperation
 
 +(instancetype)scheduledOperation:(SKProduct*)sk_product handler:(void (^)(AppStoreRestoreOperation* operation, SKPaymentTransaction* transaction, NSError* error, BOOL userCancel))handler
 {
-    AppStoreRestoreOperation* operation = [[AppStoreRestoreOperation new] autorelease];
+    AppStoreRestoreOperation* operation = [AppStoreRestoreOperation new];
     operation.sk_product = sk_product;
     operation.handler = handler;
     [operation run];
@@ -37,10 +37,6 @@
 - (void)dealloc
 {
     [PaymentQueue removeObserver:self];
-    self.sk_product = nil;
-    self.handler = nil;
-    self.restoredTransaction = nil;
-    [super dealloc];
 }
 
 -(void)run

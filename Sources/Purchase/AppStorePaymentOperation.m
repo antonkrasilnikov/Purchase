@@ -9,9 +9,9 @@
 
 @interface AppStorePaymentOperation () <SKPaymentTransactionObserver>
 
-@property (nonatomic,retain) SKProduct* sk_product;
-@property (nonatomic,retain) SKPayment *payment;
-@property (nonatomic,retain) SKPaymentTransaction *transaction;
+@property (nonatomic,strong) SKProduct* sk_product;
+@property (nonatomic,strong) SKPayment *payment;
+@property (nonatomic,strong) SKPaymentTransaction *transaction;
 @property (nonatomic,copy) void (^handler)(AppStorePaymentOperation* operation, SKPaymentTransaction* transaction, NSError* error, BOOL userCancel);
 
 @end
@@ -20,7 +20,7 @@
 
 +(instancetype)scheduledOperation:(SKProduct*)sk_product handler:(void (^)(AppStorePaymentOperation* operation, SKPaymentTransaction* transaction, NSError* error, BOOL userCancel))handler
 {
-    AppStorePaymentOperation* operation = [[AppStorePaymentOperation new] autorelease];
+    AppStorePaymentOperation* operation = [AppStorePaymentOperation new];
     operation.sk_product = sk_product;
     operation.handler = handler;
     [operation run];
@@ -58,11 +58,6 @@
 - (void)dealloc
 {
     [PaymentQueue removeObserver:self];
-    self.sk_product = nil;
-    self.handler = nil;
-    self.transaction = nil;
-    self.payment = nil;
-    [super dealloc];
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions

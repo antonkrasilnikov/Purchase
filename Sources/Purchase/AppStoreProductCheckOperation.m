@@ -9,29 +9,27 @@
 @interface AppStoreProductCheckOperation () <SKProductsRequestDelegate>
 
 @property (nonatomic,copy) void (^completionHandler)(SKProductsResponse* responce);
-@property (nonatomic,retain) SKProductsRequest* request;
+@property (nonatomic,strong) SKProductsRequest* request;
 
 @end
 
 @implementation AppStoreProductCheckOperation
 
-+(void)checkIds:(NSArray<NSString*>*)productdIds handler:(void (^)(SKProductsResponse* responce))handler
++(instancetype)scheduledOperationIds:(NSArray<NSString*>*)productdIds handler:(void (^)(SKProductsResponse* responce))handler
 {
     AppStoreProductCheckOperation* operation = [AppStoreProductCheckOperation new];
     
     operation.completionHandler = handler;
-    operation.request = [[[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:productdIds]] autorelease];
+    operation.request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:productdIds]];
     operation.request.delegate = operation;
     [operation.request start];
     
+    return operation;
 }
 
 - (void)dealloc
 {
     _request.delegate = nil;
-    self.request = nil;
-    self.completionHandler = nil;
-    [super dealloc];
 }
 
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
@@ -40,7 +38,6 @@
         if (_completionHandler) {
             _completionHandler(response);
         }
-        [self release];
     }];
 }
 

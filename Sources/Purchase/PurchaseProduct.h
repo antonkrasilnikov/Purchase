@@ -7,10 +7,12 @@
 
 @interface PurchaseProduct : NSObject <NSCoding>
 
-@property (nonatomic,retain) NSString*    identifier;
-@property (nonatomic,retain) NSString*    name;
-@property (nonatomic,retain) NSString*    cashName;
-@property (nonatomic,assign) float        price;
-@property (nonatomic,assign) BOOL         enabled;
+@property (nonatomic,strong,nonnull)  NSString* identifier;
+@property (nonatomic,strong,nullable) NSString* name;
+@property (nonatomic,strong,nullable) NSString* currency;
+@property (nonatomic,assign)          float     price;
+@property (nonatomic,assign)          BOOL      checked NS_SWIFT_NAME(isChecked);
+
+-(instancetype _Nonnull)initWithIdentifier:(NSString* _Nonnull)identifier;
 
 @end

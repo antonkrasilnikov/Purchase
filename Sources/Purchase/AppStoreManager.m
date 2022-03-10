@@ -12,7 +12,7 @@
 #import "AppStoreRestoreAllPaymentsOperation.h"
 #import "PurchaseProduct.h"
 
-NSString* const kNotificationAppStoreManagerPromoteInAppBought = @"NotificationAppStoreManagerPromoteInAppBought";
+NSNotificationName const AppStoreManagerPromoteInAppBought = @"NotificationAppStoreManagerPromoteInAppBought";
 
 static AppStoreManager* _store = nil;
 
@@ -22,6 +22,7 @@ static AppStoreManager* _store = nil;
 @property (nonatomic,strong) NSMutableArray<AppStorePaymentOperation*>* activePaymentOperations;
 @property (nonatomic,strong) NSMutableArray<AppStoreRestoreOperation*>* activeRestoreOperations;
 @property (nonatomic,strong) NSMutableArray<AppStoreRestoreAllPaymentsOperation*>* activeRestoreAllPaymentsOperations;
+@property (nonatomic,strong) NSMutableArray<AppStoreProductCheckOperation*>* activeCheckOperations;
 @property (nonatomic,strong) SKPayment *promotedPayment;
 @property (nonatomic,strong) AppStorePaymentFromStoreOperation* fromStoreOperation;
 
@@ -99,7 +100,8 @@ static AppStoreManager* _store = nil;
         self.activePaymentOperations = [NSMutableArray array];
         self.activeRestoreOperations = [NSMutableArray array];
         self.activeRestoreAllPaymentsOperations = [NSMutableArray array];
-        self.fromStoreOperation = [[AppStorePaymentFromStoreOperation new] autorelease];
+        self.activeCheckOperations = [NSMutableArray array];
+        self.fromStoreOperation = [AppStorePaymentFromStoreOperation new];
         _fromStoreOperation.delegate = self;
     }
     return self;
@@ -107,14 +109,7 @@ static AppStoreManager* _store = nil;
 
 - (void)dealloc
 {
-    self.purchasableObjects = nil;
-    self.activePaymentOperations = nil;
-    self.promotedPayment = nil;
     _fromStoreOperation.delegate = nil;
-    self.fromStoreOperation = nil;
-    self.activeRestoreOperations = nil;
-    self.activeRestoreAllPaymentsOperations = nil;
-    [super dealloc];
 }
 
 -(NSArray<SKPaymentTransaction *>*)_unfinishedTransactions
@@ -162,9 +157,9 @@ static AppStoreManager* _store = nil;
         }
     }else
     {
-        __block typeof(self) _self = self;
+        __weak typeof(self) _self = self;
         NSArray* ids = [productsToCheck valueForKey:@"identifier"];
-        [AppStoreProductCheckOperation checkIds:ids handler:^(SKProductsResponse *responce) {
+        __block AppStoreProductCheckOperation* operation = [AppStoreProductCheckOperation scheduledOperationIds:ids handler:^(SKProductsResponse *responce) {
             
             for(SKProduct *sk_product in responce.products)
             {
@@ -194,7 +189,11 @@ static AppStoreManager* _store = nil;
             if (verifyBlock) {
                 verifyBlock(YES);
             }
+            
+            [self.activeCheckOperations removeObject:operation];
         }];
+        
+        [_activeCheckOperations addObject:operation];
     }
 }
 
@@ -221,7 +220,7 @@ static AppStoreManager* _store = nil;
         
         if (sk_product == nil)
         {
-            __block typeof(self) _self = self;
+            __weak typeof(self) _self = self;
             
             [self _checkProducts:@[product] withHandler:^(BOOL checked) {
                 SKProduct *sk_product = [_self purchasableObjForProduct:product];
@@ -293,7 +292,7 @@ static AppStoreManager* _store = nil;
     NSMutableArray<AppStorePurchase*>* purchases = [NSMutableArray array];
     
     for (SKPaymentTransaction* transaction in transactions) {
-        PurchaseProduct* product = [[PurchaseProduct new] autorelease];
+        PurchaseProduct* product = [PurchaseProduct new];
         product.identifier = transaction.payment.productIdentifier;
         
         for (SKProduct* _obj in _purchasableObjects) {
@@ -320,7 +319,7 @@ static AppStoreManager* _store = nil;
         
         if (sk_product == nil)
         {
-            __block typeof(self) _self = self;
+            __weak typeof(self) _self = self;
             
             [self _checkProducts:@[product] withHandler:^(BOOL checked) {
                 SKProduct *sk_product = [_self purchasableObjForProduct:product];
@@ -385,7 +384,7 @@ static AppStoreManager* _store = nil;
                 }];
                 
                 for (SKPaymentTransaction* transaction in transactions) {
-                    PurchaseProduct* product = [[PurchaseProduct new] autorelease];
+                    PurchaseProduct* product = [PurchaseProduct new];
                     product.identifier = transaction.payment.productIdentifier;
                     AppStorePurchase* purchase = [AppStorePurchase purchaseWithProduct:product transaction:transaction];
                     
@@ -427,10 +426,10 @@ static AppStoreManager* _store = nil;
 
 -(void)fillProduct:(PurchaseProduct*)product fromPurchasableObj:(SKProduct*)sk_product
 {
-    product.enabled = YES;
+    product.checked = YES;
     product.price = [[sk_product price] doubleValue];
     product.name = [sk_product localizedTitle];
-    product.cashName = [sk_product.priceLocale objectForKey:@"currency"];
+    product.currency = [sk_product.priceLocale objectForKey:@"currency"];
 }
 
 // from store delegate
@@ -439,10 +438,10 @@ static AppStoreManager* _store = nil;
 {
     if (_promotedPayment && [sk_product.productIdentifier isEqualToString:_promotedPayment.productIdentifier]) {
         self.promotedPayment = nil;
-        PurchaseProduct* product = [[PurchaseProduct new] autorelease];
+        PurchaseProduct* product = [PurchaseProduct new];
         product.identifier = sk_product.productIdentifier;
         [self _buyProduct:product onComplete:^(AppStorePurchase *purchase) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:kNotificationAppStoreManagerPromoteInAppBought object:purchase];
+            [[NSNotificationCenter defaultCenter] postNotificationName:AppStoreManagerPromoteInAppBought object:purchase];
         } onFailed:^(NSError *error, BOOL canceled) {
             
         }];

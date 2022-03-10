@@ -5,48 +5,49 @@
 
 #import "PurchaseProduct.h"
 
+static NSString* const kName        = @"name";
+static NSString* const kIdentifier  = @"identifier";
+static NSString* const kCurrency    = @"currency";
+static NSString* const kPrice       = @"price";
+static NSString* const kChecked     = @"checked";
+
 @implementation PurchaseProduct
 
--(id)init
+-(instancetype _Nonnull)initWithIdentifier:(NSString* _Nonnull)identifier
 {
     self = [super init];
     if (self) {
+        self.identifier = identifier;
     }
     return self;
 }
 
--(void)dealloc
-{
-    self.name = nil;
-    self.identifier = nil;
-    self.cashName = nil;
-    [super dealloc];
-}
-
 -(BOOL)isEqual:(PurchaseProduct*)object
 {
-    return [object isKindOfClass:[PurchaseProduct class]] && _identifier.length > 0 && object.identifier.length > 0 && [_identifier isEqualToString:object.identifier];
+    return [object isKindOfClass:[PurchaseProduct class]] &&
+    _identifier.length > 0 && object.identifier.length > 0
+    && [_identifier isEqualToString:object.identifier];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder
 {
     if ((self = [self init])) {
-        self.name = [decoder decodeObjectOfClass:[NSString class] forKey:@"name"];
-        self.identifier = [decoder decodeObjectOfClass:[NSString class] forKey:@"identifier"];
-        self.cashName = [decoder decodeObjectOfClass:[NSString class] forKey:@"cashName"];
-        self.price = [decoder decodeFloatForKey:@"price"];
-        self.enabled = [decoder decodeBoolForKey:@"enabled"];
+        self.name = [decoder decodeObjectOfClass:[NSString class] forKey:kName];
+        self.identifier = [decoder decodeObjectOfClass:[NSString class] forKey:kIdentifier];
+        self.currency = [decoder decodeObjectOfClass:[NSString class] forKey:kCurrency];
+        self.price = [decoder decodeFloatForKey:kPrice];
+        self.checked = [decoder decodeBoolForKey:kChecked];
     }
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-    [encoder encodeObject:_name forKey:@"name"];
-    [encoder encodeObject:_identifier forKey:@"identifier"];
-    [encoder encodeObject:_cashName forKey:@"cashName"];
-    [encoder encodeFloat:_price forKey:@"price"];
-    [encoder encodeBool:_enabled forKey:@"enabled"];
+    [encoder encodeObject:_name forKey:kName];
+    [encoder encodeObject:_identifier forKey:kIdentifier];
+    [encoder encodeObject:_currency forKey:kCurrency];
+    [encoder encodeFloat:_price forKey:kPrice];
+    [encoder encodeBool:_checked forKey:kChecked];
 }
 
 @end

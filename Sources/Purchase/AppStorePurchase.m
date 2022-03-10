@@ -6,68 +6,80 @@
 #import "AppStorePurchase.h"
 #import <StoreKit/StoreKit.h>
 
+static NSString* const kProduct                 = @"product";
+static NSString* const kTransactionIdentifier   = @"transactionIdentifier";
+static NSString* const kTransactionReceipt      = @"transactionReceipt";
+static NSString* const kPurchasedDate           = @"purchasedDate";
+static NSString* const kIsSandBox               = @"isSandBox";
+
+@interface AppStorePurchase ()
+
+@property (nonatomic,strong) PurchaseProduct* product;
+@property (nonatomic,strong) NSString* transactionIdentifier;
+@property (nonatomic,strong) NSData*   transactionReceipt;
+@property (nonatomic,strong) NSDate*   purchasedDate;
+@property (nonatomic,assign) BOOL      isSandBox;
+
+@end
+
 @implementation AppStorePurchase
 
-- (id)init
+- (id)initWith:(PurchaseProduct*) product
+              :(NSString*) transactionIdentifier
+              :(NSData*)   transactionReceipt
+              :(NSDate*)   purchasedDate
+              :(BOOL)      isSandBox
 {
     self = [super init];
     if (self) {
-        self.isSandBox = NO;
+        self.product = product;
+        self.transactionIdentifier = transactionIdentifier;
+        self.transactionReceipt = transactionReceipt;
+        self.purchasedDate = purchasedDate;
+        self.isSandBox = isSandBox;
     }
     return self;
-}
-
-- (void)dealloc
-{
-    self.product = nil;
-    self.transactionIdentifier = nil;
-    self.transactionReceipt = nil;
-    self.purchasedDate = nil;
-    
-    [super dealloc];
 }
 
 +(AppStorePurchase*)purchaseWithProduct:(PurchaseProduct*)product transaction:(SKPaymentTransaction*)transaction
 {
-    AppStorePurchase* purchase = [[[AppStorePurchase alloc] init] autorelease];
-    purchase.product = product;
-    purchase.transactionIdentifier = transaction.transactionIdentifier;
+    NSDate* purchasedDate = nil;
     
     if (transaction.transactionState == SKPaymentTransactionStateRestored && transaction.originalTransaction.transactionDate != nil) {
-        purchase.purchasedDate = transaction.originalTransaction.transactionDate;
+        purchasedDate = transaction.originalTransaction.transactionDate;
     }else{
-        purchase.purchasedDate = transaction.transactionDate;
+        purchasedDate = transaction.transactionDate;
     }
     
-    NSURL *receiptUrl = [[NSBundle mainBundle] appStoreReceiptURL];
-    purchase.transactionReceipt = [NSData dataWithContentsOfURL:receiptUrl];
-
+    BOOL isSandBox = NO;
 #ifdef DEBUG
-    purchase.isSandBox = YES;
+    isSandBox = YES;
 #endif
     
-    return purchase;
+    return [[AppStorePurchase alloc] initWith:product
+                                             :transaction.transactionIdentifier
+                                             :[NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]]
+                                             :purchasedDate
+                                             :isSandBox];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder
 {
-    if ((self = [self init])) {
-        self.product = [decoder decodeObjectOfClass:[PurchaseProduct class] forKey:@"product"];
-        self.transactionIdentifier = [decoder decodeObjectOfClass:[NSString class] forKey:@"transactionIdentifier"];
-        self.transactionReceipt = [decoder decodeObjectOfClass:[NSData class] forKey:@"transactionReceipt"];
-        self.isSandBox = [decoder decodeBoolForKey:@"isSandBox"];
-        self.purchasedDate = [decoder decodeObjectOfClass:[NSDate class] forKey:@"purchasedDate"];
-    }
-    return self;
+    return [self initWith:[decoder decodeObjectOfClass:[PurchaseProduct class] forKey:kProduct]
+                         :[decoder decodeObjectOfClass:[NSString class] forKey:kTransactionIdentifier]
+                         :[decoder decodeObjectOfClass:[NSData class] forKey:kTransactionReceipt]
+                         :[decoder decodeObjectOfClass:[NSDate class] forKey:kPurchasedDate]
+                         :[decoder decodeBoolForKey:kIsSandBox]];
+
 }
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-    [encoder encodeObject:_product forKey:@"product"];
-    [encoder encodeObject:_transactionIdentifier forKey:@"transactionIdentifier"];
-    [encoder encodeObject:_transactionReceipt forKey:@"transactionReceipt"];
-    [encoder encodeBool:_isSandBox forKey:@"isSandBox"];
-    [encoder encodeObject:_purchasedDate forKey:@"purchasedDate"];
+    [encoder encodeObject:_product forKey:kProduct];
+    [encoder encodeObject:_transactionIdentifier forKey:kTransactionIdentifier];
+    [encoder encodeObject:_transactionReceipt forKey:kTransactionReceipt];
+    [encoder encodeBool:_isSandBox forKey:kIsSandBox];
+    [encoder encodeObject:_purchasedDate forKey:kPurchasedDate];
 }
 
 @end
