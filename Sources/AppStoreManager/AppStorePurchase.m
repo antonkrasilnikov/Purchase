@@ -11,6 +11,7 @@ static NSString* const kTransactionIdentifier   = @"transactionIdentifier";
 static NSString* const kTransactionReceipt      = @"transactionReceipt";
 static NSString* const kPurchasedDate           = @"purchasedDate";
 static NSString* const kIsSandBox               = @"isSandBox";
+static NSString* const kIsRestore               = @"isRestore";
 
 @interface AppStorePurchase ()
 
@@ -19,6 +20,7 @@ static NSString* const kIsSandBox               = @"isSandBox";
 @property (nonatomic,strong) NSData*   transactionReceipt;
 @property (nonatomic,strong) NSDate*   purchasedDate;
 @property (nonatomic,assign) BOOL      isSandBox;
+@property (nonatomic,assign) BOOL      isRestore;
 
 @end
 
@@ -29,6 +31,7 @@ static NSString* const kIsSandBox               = @"isSandBox";
               :(NSData*)   transactionReceipt
               :(NSDate*)   purchasedDate
               :(BOOL)      isSandBox
+              :(BOOL)      isRestore
 {
     self = [super init];
     if (self) {
@@ -37,11 +40,12 @@ static NSString* const kIsSandBox               = @"isSandBox";
         self.transactionReceipt = transactionReceipt;
         self.purchasedDate = purchasedDate;
         self.isSandBox = isSandBox;
+        self.isRestore = isRestore;
     }
     return self;
 }
 
-+(AppStorePurchase*)purchaseWithProduct:(PurchaseProduct*)product transaction:(SKPaymentTransaction*)transaction
++(AppStorePurchase*)purchaseWithProduct:(PurchaseProduct*)product transaction:(SKPaymentTransaction*)transaction isRestore:(BOOL)isRestore
 {
     NSDate* purchasedDate = nil;
     
@@ -60,7 +64,8 @@ static NSString* const kIsSandBox               = @"isSandBox";
                                              :transaction.transactionIdentifier
                                              :[NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]]
                                              :purchasedDate
-                                             :isSandBox];
+                                             :isSandBox
+                                             :isRestore];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder
@@ -69,7 +74,8 @@ static NSString* const kIsSandBox               = @"isSandBox";
                          :[decoder decodeObjectOfClass:[NSString class] forKey:kTransactionIdentifier]
                          :[decoder decodeObjectOfClass:[NSData class] forKey:kTransactionReceipt]
                          :[decoder decodeObjectOfClass:[NSDate class] forKey:kPurchasedDate]
-                         :[decoder decodeBoolForKey:kIsSandBox]];
+                         :[decoder decodeBoolForKey:kIsSandBox]
+                         :[decoder decodeBoolForKey:kIsRestore]];
 
 }
 
@@ -79,6 +85,7 @@ static NSString* const kIsSandBox               = @"isSandBox";
     [encoder encodeObject:_transactionIdentifier forKey:kTransactionIdentifier];
     [encoder encodeObject:_transactionReceipt forKey:kTransactionReceipt];
     [encoder encodeBool:_isSandBox forKey:kIsSandBox];
+    [encoder encodeBool:_isRestore forKey:kIsRestore];
     [encoder encodeObject:_purchasedDate forKey:kPurchasedDate];
 }
 

@@ -251,7 +251,7 @@ static AppStoreManager* _store = nil;
         AppStorePaymentOperation* operation = [AppStorePaymentOperation scheduledOperation:sk_product handler:^(AppStorePaymentOperation* _operation, SKPaymentTransaction *transaction, NSError *error, BOOL userCancel) {
             
             if (transaction != nil) {
-                AppStorePurchase* purchase = [AppStorePurchase purchaseWithProduct:product transaction:transaction];
+                AppStorePurchase* purchase = [AppStorePurchase purchaseWithProduct:product transaction:transaction isRestore:NO];
                 if (completionBlock) {
                     completionBlock(purchase);
                 }
@@ -302,7 +302,7 @@ static AppStoreManager* _store = nil;
             }
         }
         
-        AppStorePurchase* purchase = [AppStorePurchase purchaseWithProduct:product transaction:transaction];
+        AppStorePurchase* purchase = [AppStorePurchase purchaseWithProduct:product transaction:transaction isRestore:NO];
         [purchases addObject:purchase];
     }
     
@@ -340,7 +340,7 @@ static AppStoreManager* _store = nil;
         AppStoreRestoreOperation* operation = [AppStoreRestoreOperation scheduledOperation:sk_product handler:^(AppStoreRestoreOperation *_operation, SKPaymentTransaction *transaction, NSError *error, BOOL userCancel) {
             
             if (transaction != nil) {
-                AppStorePurchase* purchase = [AppStorePurchase purchaseWithProduct:product transaction:transaction];
+                AppStorePurchase* purchase = [AppStorePurchase purchaseWithProduct:product transaction:transaction isRestore:YES];
                 if (onRestoreCompleted) {
                     onRestoreCompleted(YES,purchase);
                 }
@@ -386,7 +386,7 @@ static AppStoreManager* _store = nil;
                 for (SKPaymentTransaction* transaction in transactions) {
                     PurchaseProduct* product = [PurchaseProduct new];
                     product.identifier = transaction.payment.productIdentifier;
-                    AppStorePurchase* purchase = [AppStorePurchase purchaseWithProduct:product transaction:transaction];
+                    AppStorePurchase* purchase = [AppStorePurchase purchaseWithProduct:product transaction:transaction isRestore:YES];
                     
                     for (AppStorePurchase* _purchase in purchases) {
                         if ([_purchase.product isEqual:purchase.product]) {
